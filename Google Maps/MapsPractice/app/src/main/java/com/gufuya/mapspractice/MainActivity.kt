@@ -2,14 +2,15 @@ package com.gufuya.mapspractice
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.text.SpannableString
 import android.text.style.TextAppearanceSpan
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
@@ -48,6 +49,8 @@ class MainActivity : AppCompatActivity(),
     private lateinit var locationCallback: LocationCallback
     private var markerList: MutableList<Marker> = ArrayList()
 
+    private var visibleMarkerList: MutableList<Marker> = ArrayList()
+    private lateinit var locations: List<Location>
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +67,7 @@ class MainActivity : AppCompatActivity(),
 
         val mainOptions = listOf(R.id.ver, R.id.ocultar)
         val menu = navView.menu
-        val secOptions = listOf(R.id.verKarts, R.id.verHoteles, R.id.ocultarTodo)
+        val secOptions = listOf(R.id.verKarts, R.id.verRestaurantes, R.id.ocultarTodo)
 
         for(option in mainOptions){
             val tools = menu.findItem(option)
@@ -96,7 +99,12 @@ class MainActivity : AppCompatActivity(),
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        mMap.setOnInfoWindowClickListener { this }
+        mMap.setOnInfoWindowClickListener {
+            marker ->
+                onInfoWindowClick(marker)
+        }
+
+        locations = Location.readLocations(this)
 
         // Add my townhall location and zoom
         val townHall = LatLng(39.436746, -0.4660131)
@@ -110,6 +118,8 @@ class MainActivity : AppCompatActivity(),
 
         //Setting the style of the map
         mMap.setMapStyle (MapStyleOptions.loadRawResourceStyle (this, R.raw.style_json))
+
+
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -143,6 +153,23 @@ class MainActivity : AppCompatActivity(),
                 removeLocations()
                 for(locationMarker: Marker in markerList){
                     locationMarker.remove()
+                }
+                true
+            }
+
+            R.id.verKarts -> {
+                seeMarkers("kart")
+                true
+            }
+
+            R.id.verRestaurantes -> {
+                seeMarkers("restaurante")
+                true
+            }
+
+            R.id.ocultarTodo -> {
+                for(m in visibleMarkerList){
+                    m.remove()
                 }
                 true
             }
@@ -200,31 +227,65 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onInfoWindowClick(marker: Marker?) {
-        Toast.makeText(this, "A", Toast.LENGTH_SHORT).show()
         if(marker!=null){
-            //we get the marker
-            var markerPos : LatLng = marker.position
-
-            //we create the dialog
-            val customDialog = AlertDialog.Builder(this).setCancelable(false)
-
-            //Add the info like text and tittle
-            customDialog.setTitle("MapsPractice")
-            customDialog.setMessage("Su ubicación actual es \nLat: ${markerPos.latitude} Lon: ${markerPos.longitude}")
-            customDialog.setIcon(R.mipmap.ic_launcher)
-
-            //Now, we add the button which closes the application
-            val positiveButtonClick = { dialog: DialogInterface, which: Int ->
-                dialog.dismiss()
+            if (marker.tag?.equals("kart") == true){
+                var url: String = ""
+                for(location in locations){
+                    if (marker.title.equals(location.title)){
+                        url = location.fragment
+                    }
+                }
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(browserIntent)
+            } else if (marker.tag?.equals("restaurante") == true) {
+                var tlf: String = ""
+                for(location in locations){
+                    if (marker.title.equals(location.title)){
+                        tlf = location.fragment
+                    }
+                }
+                val intent = Intent(Intent.ACTION_DIAL,Uri.parse("tel:$tlf"))
+                startActivity(intent)
             }
-            customDialog.setPositiveButton("OK", DialogInterface.OnClickListener(function = positiveButtonClick))
+            else{
+                //we get the marker
+                var markerPos : LatLng = marker.position
 
-            //And finally create the dialog
-            customDialog.create()
-            customDialog.show()
+                //we create the dialog
+                val customDialog = AlertDialog.Builder(this).setCancelable(false)
+
+                //Add the info like text and tittle
+                customDialog.setTitle("MapsPractice")
+                customDialog.setMessage("Su ubicación actual es \nLat: ${markerPos.latitude} Lon: ${markerPos.longitude}")
+                customDialog.setIcon(R.mipmap.ic_launcher_foreground)
+
+                //Now, we add the button which closes the application
+                val positiveButtonClick = { dialog: DialogInterface, which: Int ->
+                    dialog.dismiss()
+                }
+                customDialog.setPositiveButton("OK", DialogInterface.OnClickListener(function = positiveButtonClick))
+
+                //And finally create the dialog
+                customDialog.create()
+                customDialog.show()
+            }
         }
     }
 
+    fun seeMarkers(tag:String){
+        for(location in locations){
+            if(location.tag.equals("kart") && tag.equals("kart")){
+                val marker = mMap.addMarker(MarkerOptions().position(LatLng(location.latitude,location.longitude)).title(location.title).snippet(location.fragment).icon(BitmapDescriptorFactory.fromResource(R.mipmap.kart_icon)))
+                marker.setTag("kart")
+                visibleMarkerList.add(marker)
+            }
+            else if(location.tag.equals("restaurante") && tag.equals("restaurante")){
+                val marker = mMap.addMarker(MarkerOptions().position(LatLng(location.latitude,location.longitude)).title(location.title).snippet(location.fragment).icon(BitmapDescriptorFactory.fromResource(R.mipmap.food_icon)))
+                marker.setTag("restaurante")
+                visibleMarkerList.add(marker)
+            }
+        }
+    }
 }
 
 

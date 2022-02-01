@@ -8,8 +8,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/ver"
-            android:title="Ver mi localización"
-            android:checked="true"/>
+            android:title="Ver mi localización" />
         <item
             android:id="@+id/ocultar"
             android:title="Oculta mi localización" />
@@ -21,8 +20,8 @@
             android:id="@+id/verKarts"
             android:title="Ver circuitos de Kats" />
         <item
-            android:id="@+id/verHoteles"
-            android:title="Ver Hoteles" />
+            android:id="@+id/verRestaurantes"
+            android:title="Ver Restaurantes" />
         <item
             android:id="@+id/ocultarTodo"
             android:title="Ocultar todo" />

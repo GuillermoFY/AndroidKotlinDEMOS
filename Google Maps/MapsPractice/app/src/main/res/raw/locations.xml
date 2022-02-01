@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<locations>
+    <location>
+        <title>Karting Racing Dakart Valencia CC Ademuz</title>
+        <fragment>http://racingdakartvalencia.com/</fragment>
+        <tag>kart</tag>
+        <latitude>39.5005356</latitude>
+        <longitude>-0.4119589</longitude>
+    </location>
+    <location>
+        <title>Valencia Karting Center</title>
+        <fragment>https://palaudelsosset.com/</fragment>
+        <tag>kart</tag>
+        <latitude>39.5108827</latitude>
+        <longitude>-0.4699918</longitude>
+    </location>
+    <location>
+        <title>Karting M4 Massanasa</title>
+        <fragment>http://www.kartingm4.com/</fragment>
+        <tag>kart</tag>
+        <latitude>39.4116007</latitude>
+        <longitude>-0.3881795</longitude>
+    </location>
+    <location>
+        <title>The Fitzgerald</title>
+        <fragment>961560246</fragment>
+        <tag>restaurante</tag>
+        <latitude>39.4245547</latitude>
+        <longitude>-0.4838742</longitude>
+    </location>
+    <location>
+        <title>Goiko</title>
+        <fragment>961169802</fragment>
+        <tag>restaurante</tag>
+        <latitude>39.4669559</latitude>
+        <longitude>-0.3712811</longitude>
+    </location>
+</locations>
